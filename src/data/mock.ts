@@ -11,6 +11,8 @@ export interface Outlet {
   phone: string;
   address: string;
   cls: OutletClass;
+  /** channel / segment, same list as the Sales Operations module (assortment key with cls). */
+  segment: string;
   status: CustomerStatus;
   priceGroup: "Retail" | "Grosir" | "Horeka / Industri";
   creditLimit: number;
@@ -63,24 +65,24 @@ export function priceFor(p: Product, uom: string, group: Outlet["priceGroup"]): 
 }
 
 export const OUTLETS: Outlet[] = [
-  { id: "O1", code: "SBY-0142", name: "Toko Plastik Sumber Rejeki", owner: "Hendra Wijaya", phone: "081231234501", address: "Jl. Kenjeran No. 112, Surabaya", cls: "A", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 50_000_000, outstanding: 31_400_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2489, lng: 112.7795 }, demoDistance: 24,
+  { id: "O1", code: "SBY-0142", name: "Toko Plastik Sumber Rejeki", owner: "Hendra Wijaya", phone: "081231234501", address: "Jl. Kenjeran No. 112, Surabaya", cls: "A", segment: "Grosir Plastik", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 50_000_000, outstanding: 31_400_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2489, lng: 112.7795 }, demoDistance: 24,
     lastOrder: { no: "SO-SBY-202611-0009", date: "11 Nov 2026", total: 7_548_000, status: "Dikirim", items: [{ productId: "P01", uom: "karton", qty: 10 }, { productId: "P02", uom: "karton", qty: 4 }, { productId: "P09", uom: "pack", qty: 20 }] } },
-  { id: "O2", code: "SBY-0157", name: "UD Makmur Jaya", owner: "Siti Rahayu", phone: "081231234502", address: "Jl. Tambak Wedi Baru 8, Surabaya", cls: "B", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 20_000_000, outstanding: 18_900_000, overdue: 4_250_000, overdueDays: 12, top: 14, gps: { lat: -7.2311, lng: 112.7769 }, demoDistance: 41,
+  { id: "O2", code: "SBY-0157", name: "UD Makmur Jaya", owner: "Siti Rahayu", phone: "081231234502", address: "Jl. Tambak Wedi Baru 8, Surabaya", cls: "B", segment: "Toko Kemasan", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 20_000_000, outstanding: 18_900_000, overdue: 4_250_000, overdueDays: 12, top: 14, gps: { lat: -7.2311, lng: 112.7769 }, demoDistance: 41,
     lastOrder: { no: "SO-SBY-202610-0131", date: "28 Okt 2026", total: 2_310_000, status: "Selesai", items: [{ productId: "P03", uom: "pack", qty: 40 }, { productId: "P04", uom: "pack", qty: 30 }] } },
-  { id: "O3", code: "SBY-0163", name: "Kedai Kopi Pantai Ria", owner: "Agus Salim", phone: "081231234503", address: "Jl. Pantai Ria Kenjeran 21, Surabaya", cls: "C", status: "Lama – belum beli", priceGroup: "Horeka / Industri", creditLimit: 5_000_000, outstanding: 0, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2402, lng: 112.7951 }, demoDistance: 168 },
-  { id: "O4", code: "SBY-0171", name: "Grosir Plastik Abadi", owner: "Lukas Tanoto", phone: "081231234504", address: "Jl. Sukolilo Lor 45, Surabaya", cls: "A", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 75_000_000, outstanding: 42_000_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2551, lng: 112.7882 }, demoDistance: 12,
+  { id: "O3", code: "SBY-0163", name: "Kedai Kopi Pantai Ria", owner: "Agus Salim", phone: "081231234503", address: "Jl. Pantai Ria Kenjeran 21, Surabaya", cls: "C", segment: "Horeka", status: "Lama – belum beli", priceGroup: "Horeka / Industri", creditLimit: 5_000_000, outstanding: 0, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2402, lng: 112.7951 }, demoDistance: 168 },
+  { id: "O4", code: "SBY-0171", name: "Grosir Plastik Abadi", owner: "Lukas Tanoto", phone: "081231234504", address: "Jl. Sukolilo Lor 45, Surabaya", cls: "A", segment: "Grosir Plastik", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 75_000_000, outstanding: 42_000_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2551, lng: 112.7882 }, demoDistance: 12,
     lastOrder: { no: "SO-SBY-202611-0004", date: "4 Nov 2026", total: 14_850_000, status: "Selesai", items: [{ productId: "P06", uom: "karton", qty: 5 }, { productId: "P12", uom: "karton", qty: 8 }, { productId: "P11", uom: "bal", qty: 10 }] } },
-  { id: "O5", code: "SBY-0188", name: "Toko Kue Bu Ani", owner: "Ani Lestari", phone: "081231234505", address: "Jl. Bulak Banteng 17, Surabaya", cls: "C", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 3_000_000, outstanding: 640_000, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2265, lng: 112.7612 }, demoDistance: 55,
+  { id: "O5", code: "SBY-0188", name: "Toko Kue Bu Ani", owner: "Ani Lestari", phone: "081231234505", address: "Jl. Bulak Banteng 17, Surabaya", cls: "C", segment: "Toko Kemasan", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 3_000_000, outstanding: 640_000, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2265, lng: 112.7612 }, demoDistance: 55,
     lastOrder: { no: "SO-SBY-202610-0145", date: "30 Okt 2026", total: 640_000, status: "Selesai", items: [{ productId: "P08", uom: "pack", qty: 8 }, { productId: "P04", uom: "pack", qty: 9 }] } },
-  { id: "O6", code: "SBY-0193", name: "RM Sederhana Kenjeran", owner: "Rudi Hartono", phone: "081231234506", address: "Jl. Kenjeran No. 330, Surabaya", cls: "B", status: "Lama – sudah beli", priceGroup: "Horeka / Industri", creditLimit: 15_000_000, outstanding: 5_120_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2447, lng: 112.7705 }, demoDistance: 33,
+  { id: "O6", code: "SBY-0193", name: "RM Sederhana Kenjeran", owner: "Rudi Hartono", phone: "081231234506", address: "Jl. Kenjeran No. 330, Surabaya", cls: "B", segment: "Horeka", status: "Lama – sudah beli", priceGroup: "Horeka / Industri", creditLimit: 15_000_000, outstanding: 5_120_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2447, lng: 112.7705 }, demoDistance: 33,
     lastOrder: { no: "SO-SBY-202611-0002", date: "3 Nov 2026", total: 5_120_000, status: "Dikirim", items: [{ productId: "P04", uom: "karton", qty: 4 }, { productId: "P03", uom: "karton", qty: 2 }] } },
-  { id: "O7", code: "SBY-0207", name: "Toko Serba Ada Mulyo", owner: "Wahyu Prasetyo", phone: "081231234507", address: "Jl. Wonosari Lor 3, Surabaya", cls: "B", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 10_000_000, outstanding: 2_400_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2350, lng: 112.7550 }, demoDistance: 18,
+  { id: "O7", code: "SBY-0207", name: "Toko Serba Ada Mulyo", owner: "Wahyu Prasetyo", phone: "081231234507", address: "Jl. Wonosari Lor 3, Surabaya", cls: "B", segment: "Toko Kelontong", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 10_000_000, outstanding: 2_400_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2350, lng: 112.7550 }, demoDistance: 18,
     lastOrder: { no: "SO-SBY-202610-0120", date: "21 Okt 2026", total: 2_400_000, status: "Selesai", items: [{ productId: "P07", uom: "pcs", qty: 48 }, { productId: "P01", uom: "pack", qty: 66 }] } },
-  { id: "O8", code: "PRS-0012", name: "Calon: Toko Plastik Berkah", owner: "Yusuf Hamdani", phone: "081231234508", address: "Jl. Tanah Merah Utara 9, Surabaya", cls: "C", status: "Baru", priceGroup: "Retail", creditLimit: 0, outstanding: 0, overdue: 0, overdueDays: 0, top: 0, demoDistance: 0, prospect: true },
+  { id: "O8", code: "PRS-0012", name: "Calon: Toko Plastik Berkah", owner: "Yusuf Hamdani", phone: "081231234508", address: "Jl. Tanah Merah Utara 9, Surabaya", cls: "C", segment: "Toko Kemasan", status: "Baru", priceGroup: "Retail", creditLimit: 0, outstanding: 0, overdue: 0, overdueDays: 0, top: 0, demoDistance: 0, prospect: true },
   // Outside today's route: for Kunjungan Ekstra
-  { id: "O9", code: "SBY-0215", name: "Toko Plastik Maju Bersama", owner: "Andreas Gunawan", phone: "081231234509", address: "Jl. Mulyorejo Utara 50, Surabaya", cls: "B", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 12_000_000, outstanding: 3_300_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2660, lng: 112.7850 }, demoDistance: 27,
+  { id: "O9", code: "SBY-0215", name: "Toko Plastik Maju Bersama", owner: "Andreas Gunawan", phone: "081231234509", address: "Jl. Mulyorejo Utara 50, Surabaya", cls: "B", segment: "Toko Kelontong", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 12_000_000, outstanding: 3_300_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2660, lng: 112.7850 }, demoDistance: 27,
     lastOrder: { no: "SO-SBY-202610-0099", date: "14 Okt 2026", total: 3_300_000, status: "Selesai", items: [{ productId: "P02", uom: "pack", qty: 60 }, { productId: "P09", uom: "pack", qty: 20 }] } },
-  { id: "O10", code: "SBY-0222", name: "CV Sentosa Packaging", owner: "Melinda Halim", phone: "081231234510", address: "Jl. Kalijudan 77, Surabaya", cls: "A", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 60_000_000, outstanding: 12_700_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2580, lng: 112.7710 }, demoDistance: 46 },
+  { id: "O10", code: "SBY-0222", name: "CV Sentosa Packaging", owner: "Melinda Halim", phone: "081231234510", address: "Jl. Kalijudan 77, Surabaya", cls: "A", segment: "Agen / Sub-distributor", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 60_000_000, outstanding: 12_700_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2580, lng: 112.7710 }, demoDistance: 46 },
 ];
 export const outletById = (id: string) => OUTLETS.find((o) => o.id === id)!;
 
@@ -141,3 +143,19 @@ export const INVOICES: Invoice[] = [
 ];
 
 export const DEPOSIT_TARGETS = ["Kasir Cabang Surabaya", "Transfer ke rekening BCA UP 0881234567"];
+
+/** Assortment per segment x class, published by the Sales Operations module (same seed as poc/sales-ops-web). [productId, mustSell] */
+export const ASSORTMENT: Record<string, [string, boolean][]> = {
+  "Grosir Plastik|A": [["P01", true], ["P02", true], ["P06", true], ["P11", false], ["P12", false], ["P07", false], ["P03", false]],
+  "Grosir Plastik|B": [["P01", true], ["P02", true], ["P11", false], ["P07", false]],
+  "Toko Kemasan|B": [["P03", true], ["P04", true], ["P09", false], ["P08", false]],
+  "Toko Kemasan|C": [["P03", true], ["P04", false], ["P09", false]],
+  "Horeka|B": [["P04", true], ["P03", false], ["P09", false]],
+  "Toko Kelontong|B": [["P01", true], ["P07", false], ["P09", false]],
+  "Agen / Sub-distributor|A": [["P01", true], ["P02", true], ["P03", true], ["P04", false], ["P11", false], ["P12", false]],
+};
+/** Products offered to an outlet; no assortment for its segment x class → all products (module setting "fallback = all"). */
+export function assortmentOf(o: Outlet): { productId: string; mustSell: boolean }[] {
+  const a = ASSORTMENT[`${o.segment}|${o.cls}`];
+  return a ? a.map(([productId, mustSell]) => ({ productId, mustSell })) : PRODUCTS.map((p) => ({ productId: p.id, mustSell: false }));
+}

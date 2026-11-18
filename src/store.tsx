@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { INVOICES, TODAY_PLAN, outletById, priceFor, productById } from "@/data/mock";
-import type { BillValue, Values } from "@/flow/types";
+import { INVOICES, TODAY_PLAN, assortmentOf, outletById, priceFor, productById } from "@/data/mock";
+import type { BillItemMaster, BillValue, Values } from "@/flow/types";
 
 export interface Task {
   id: string;
@@ -27,9 +27,13 @@ function seedTasks(): Task[] {
   return TODAY_PLAN.map((p, i) => {
     const o = outletById(p.outletId);
     const last = o.lastOrder;
-    const pesanan: BillValue | undefined = last
-      ? { items: last.items.map((it) => { const pr = productById(it.productId); return { name: `${pr.name} (${it.uom})`, unitPrice: priceFor(pr, it.uom, o.priceGroup), qty: it.qty }; }), costs: [] }
-      : undefined;
+    // Catalog = outlet assortment (Data Source published by the module); price from the outlet's price list.
+    const assort = assortmentOf(o);
+    const katalog: BillItemMaster[] = assort.flatMap((a) => { const pr = productById(a.productId); return pr.uoms.map((u) => ({ name: `${pr.name} (${u.uom})`, unit_price: priceFor(pr, u.uom, o.priceGroup) })); });
+    // Bill prefill: last order (repeat order) + must-sell items not in it, qty 0.
+    const lastItems = (last?.items ?? []).map((it) => { const pr = productById(it.productId); return { name: `${pr.name} (${it.uom})`, unitPrice: priceFor(pr, it.uom, o.priceGroup), qty: it.qty }; });
+    const mustSell = assort.filter((a) => a.mustSell && !lastItems.some((l) => l.name.startsWith(productById(a.productId).name))).map((a) => { const pr = productById(a.productId); const u = pr.uoms[0].uom; return { name: `${pr.name} (${u})`, unitPrice: priceFor(pr, u, o.priceGroup), qty: 0 }; });
+    const pesanan: BillValue | undefined = o.prospect ? undefined : { items: [...lastItems, ...mustSell], costs: [] };
     return {
       id: p.id,
       flow: "Kunjungan",
@@ -50,6 +54,7 @@ function seedTasks(): Task[] {
         sisaLimit: Math.max(0, o.creditLimit - o.outstanding),
         pesananTerakhir: last ? `${last.no} · ${last.date}` : "-",
         pesanan,
+        katalogPesanan: katalog,
       },
     };
   });

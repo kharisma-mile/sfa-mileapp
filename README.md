@@ -20,6 +20,8 @@ Mockup interaktif **frontend-only** aplikasi lapangan sales UP. Tampilannya meng
 | Penagihan | Buat Task | Initial page (outlet, faktur multi) → Pembayaran (nilai, metode → data giro via onSelect, bukti) → Konfirmasi (view + tanda tangan) |
 | Setoran | Buat Task | Initial page (tujuan, nilai) → Bukti Setor |
 
+Katalog Bill Pesanan per outlet = **assortment** segmen × kelas dari Modul Sales Operations (Data Source); produk wajib (must-sell) sudah terisi qty 0, harga dari price list outlet.
+
 Cek kredit, LOA dan approval tidak ada di aplikasi lapangan. Semuanya dijalankan Modul Sales Operations saat data task masuk (PRD 06/07).
 
 ## Run

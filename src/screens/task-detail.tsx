@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { flowByName } from "@/flow/flows";
 import { resolveText, visibility, workPages } from "@/flow/engine";
-import type { BillC, BillValue, Component, PhotoValue, Values } from "@/flow/types";
+import type { BillC, BillItemMaster, BillValue, Component, PhotoValue, Values } from "@/flow/types";
 import { useStore } from "@/store";
 import { AppBar, BillEditor, BottomButton, PageTitle, PhotoField, SelectField, SignatureField, Spinner, ViewField, InputField, type BillTab } from "@/ui/mf";
 
@@ -25,7 +25,10 @@ export function TaskDetail({ taskId }: { taskId: string }) {
   const page = pages[Math.min(idx, pages.length - 1)];
   const isLast = idx >= pages.length - 1;
   const comps = page.components.filter((c) => vis[c.id]);
-  const billOnly = comps.length === 1 && comps[0].component === "bill" ? (comps[0] as BillC) : null;
+  const billComp = comps.length === 1 && comps[0].component === "bill" ? (comps[0] as BillC) : null;
+  // Per-outlet catalog (Data Source filtered by assortment) replaces the flow's master items when present.
+  const katalog = billComp ? (values[`katalog${billComp.id[0].toUpperCase()}${billComp.id.slice(1)}`] as BillItemMaster[] | undefined) : undefined;
+  const billOnly = billComp ? { ...billComp, masterItems: katalog ?? billComp.masterItems } : null;
   const set = (v: Values) => s.setValues(task.id, v);
 
   const next = () => {

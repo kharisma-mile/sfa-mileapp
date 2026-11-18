@@ -28,7 +28,7 @@ export interface BillLine { name: string; unitPrice: number; qty: number }
 export interface BillCost { type: "cost" | "discount"; name: string; amount: number }
 export interface BillValue { items: BillLine[]; costs: BillCost[] }
 export interface PhotoValue { id: string; at: string; hue: number }
-export type Value = string | string[] | number | PhotoValue[] | BillValue | boolean | null | undefined;
+export type Value = string | string[] | number | PhotoValue[] | BillValue | BillItemMaster[] | boolean | null | undefined;
 export type Values = Record<string, Value>;
 
 export const billTotals = (b?: BillValue) => {
