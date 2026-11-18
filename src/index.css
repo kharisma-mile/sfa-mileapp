@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/*
+  Mile Field look (observed on field.mile.app v1.45.3, 2026-11-18) + V4 tokens from ClickUp
+  "V4 Docs Summary": blue for bars/buttons/selection, red only for errors, green = done,
+  amber = waiting / needs action, grey = read-only. Tap targets >= 48px, 16px page margin.
+*/
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bar: #2196f3;          /* app bar */
+  --color-brand: #02a8f3;        /* MileApp blue: buttons, links, active nav */
+  --color-brand-dark: #0288d1;
+  --color-brand-50: #e6f7ff;     /* sync banner, selected chip bg */
+  --color-ink: #212121;          /* main text */
+  --color-sub: #616161;          /* labels, captions */
+  --color-faint: #9e9e9e;        /* placeholders, disabled */
+  --color-line: #e0e0e0;         /* dividers */
+  --color-under: #bdbdbd;        /* input underline */
+  --color-canvas: #fafafa;       /* page background */
+  --color-err: #e7000b;
+  --color-ok: #16a34a;
+  --color-warn: #d97706;
+  --color-warn-50: #fffbeb;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #e9edf1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Toast style seen in Mile Field (green gradient, serif-free here) */
+.mf-toast {
+  background: linear-gradient(90deg, #11b28a 0%, #8cc63f 100%);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+@keyframes mf-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes mf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mf-spin { to { transform: rotate(360deg); } }
+.mf-sheet { animation: mf-sheet-in .22s ease-out; }
+.mf-fade { animation: mf-fade-in .18s ease-out; }
+.mf-spin { animation: mf-spin 1s linear infinite; }
