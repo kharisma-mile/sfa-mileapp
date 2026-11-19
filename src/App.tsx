@@ -29,9 +29,9 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
         <h2 className="mt-1 text-[22px] font-extrabold text-[#263238]">Aplikasi sales lapangan</h2>
         <p className="mt-2">Mockup mengikuti UI/UX Mile Field. Setiap layar task adalah flow berisi komponen standar Mile Field (view, input, select, photo, signature, bill). Data dummy, tanpa backend; muat ulang untuk reset.</p>
         <ul className="mt-3 list-disc space-y-1 pl-5">
-          <li>Tugas: kunjungan hari ini dari PJP</li>
-          <li>Flow Kunjungan: Info Outlet, Check-in, Pesanan, Checklist & Survey, Hasil</li>
-          <li>Buat Task: Kunjungan (ekstra), Pelanggan Baru, Retur, Penagihan, Setoran</li>
+          <li>Tugas hari ini: Mulai Call Plan, Check-in Outlet per outlet PJP, Akhiri Call Plan</li>
+          <li>Check-in Outlet (kunjungan): Info Outlet, Check-in, Aktivitas di Toko, Hasil Kunjungan, Check-out</li>
+          <li>Buat Task saat di toko: Penjualan, Retur, Penagihan, Survey; juga Setoran, Pelanggan Baru, Check-in Outlet (ekstra)</li>
           <li>Tetap bisa transaksi tanpa sinyal; data tersinkron saat online</li>
         </ul>
       </aside>

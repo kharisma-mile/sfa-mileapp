@@ -19,7 +19,7 @@ export function TaskDetail({ taskId }: { taskId: string }) {
   const [billTab, setBillTab] = useState<BillTab>("Barang");
   const [finishing, setFinishing] = useState(false);
 
-  const values = task.values;
+  const values = s.valuesOf(task);
   const vis = visibility(flow, values);
   const pages = workPages(flow, values);
   const page = pages[Math.min(idx, pages.length - 1)];

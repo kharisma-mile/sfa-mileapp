@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { INVOICES, TODAY_PLAN, assortmentOf, outletById, priceFor, productById } from "@/data/mock";
-import type { BillItemMaster, BillValue, Values } from "@/flow/types";
+import { INVOICES, OUTLETS, SALESMAN, TODAY_PLAN, assortmentOf, outletById, priceFor, productById, type Outlet } from "@/data/mock";
+import { billTotals, num, type BillItemMaster, type BillValue, type Values } from "@/flow/types";
 
 export interface Task {
   id: string;
@@ -22,42 +22,94 @@ const DATE_LABEL = "Rabu, 18 Nov 2026";
 export const dateLabel = () => DATE_LABEL;
 export const clock = () => new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
-/* Today's visits: tasks created by the Sales Operations module from the PJP (one task per outlet). */
+/** Penjualan values for an outlet: credit info, catalog = outlet assortment (Data Source published by the module,
+ *  price from the outlet's price list), bill prefill = last order (repeat order) + must-sell items not in it (qty 0). */
+export function orderValuesFor(o: Outlet): Values {
+  const last = o.lastOrder;
+  const assort = assortmentOf(o);
+  const katalog: BillItemMaster[] = assort.flatMap((a) => { const pr = productById(a.productId); return pr.uoms.map((u) => ({ name: `${pr.name} (${u.uom})`, unit_price: priceFor(pr, u.uom, o.priceGroup) })); });
+  const lastItems = (last?.items ?? []).map((it) => { const pr = productById(it.productId); return { name: `${pr.name} (${it.uom})`, unitPrice: priceFor(pr, it.uom, o.priceGroup), qty: it.qty }; });
+  const mustSell = assort.filter((a) => a.mustSell && !lastItems.some((l) => l.name.startsWith(productById(a.productId).name))).map((a) => { const pr = productById(a.productId); const u = pr.uoms[0].uom; return { name: `${pr.name} (${u})`, unitPrice: priceFor(pr, u, o.priceGroup), qty: 0 }; });
+  const pesanan: BillValue | undefined = o.prospect ? undefined : { items: [...lastItems, ...mustSell], costs: [] };
+  return {
+    kodeOutlet: o.code,
+    limitKredit: o.creditLimit,
+    outstanding: o.outstanding,
+    overdue: o.overdue,
+    sisaLimit: Math.max(0, o.creditLimit - o.outstanding),
+    pesananTerakhir: last ? `${last.no} · ${last.date}` : "-",
+    pesanan,
+    katalogPesanan: katalog,
+  };
+}
+
+/** Values filled from master data when a task is created from Buat Task (mock of the flow's Data Source lookups). */
+function derivedOnCreate(flow: string, values: Values): Values {
+  if (flow === "Penjualan") {
+    const o = OUTLETS.find((x) => x.name === (values.outletJual as string[] | undefined)?.[0]);
+    return o ? { ...values, ...orderValuesFor(o) } : values;
+  }
+  return values;
+}
+
+const PLAN_NAMES = TODAY_PLAN.map((p) => outletById(p.outletId).name);
+const visitTime = (i: number) => `0${8 + Math.floor(i / 2)}:${i % 2 ? "30" : "00"} AM`.replace(/^0(\d\d)/, "$1");
+
+/* Today's tasks, created by the Sales Operations module: Mulai Call Plan, one Check-in Outlet per PJP outlet, Akhiri Call Plan. */
 function seedTasks(): Task[] {
-  return TODAY_PLAN.map((p, i) => {
+  const mulai: Task = {
+    id: "CP-START", flow: "Mulai Call Plan", status: "ONGOING", synced: true, time: "07:30 AM", orderIndex: 0,
+    values: { ruteHariIni: SALESMAN.route, rencanaHariIni: `${TODAY_PLAN.length} kunjungan`, waktuMulai: `${clock()} · ${DATE_LABEL}`, daftarOutlet: PLAN_NAMES.join(", ") },
+  };
+  const visits: Task[] = TODAY_PLAN.map((p, i) => {
     const o = outletById(p.outletId);
-    const last = o.lastOrder;
-    // Catalog = outlet assortment (Data Source published by the module); price from the outlet's price list.
-    const assort = assortmentOf(o);
-    const katalog: BillItemMaster[] = assort.flatMap((a) => { const pr = productById(a.productId); return pr.uoms.map((u) => ({ name: `${pr.name} (${u.uom})`, unit_price: priceFor(pr, u.uom, o.priceGroup) })); });
-    // Bill prefill: last order (repeat order) + must-sell items not in it, qty 0.
-    const lastItems = (last?.items ?? []).map((it) => { const pr = productById(it.productId); return { name: `${pr.name} (${it.uom})`, unitPrice: priceFor(pr, it.uom, o.priceGroup), qty: it.qty }; });
-    const mustSell = assort.filter((a) => a.mustSell && !lastItems.some((l) => l.name.startsWith(productById(a.productId).name))).map((a) => { const pr = productById(a.productId); const u = pr.uoms[0].uom; return { name: `${pr.name} (${u})`, unitPrice: priceFor(pr, u, o.priceGroup), qty: 0 }; });
-    const pesanan: BillValue | undefined = o.prospect ? undefined : { items: [...lastItems, ...mustSell], costs: [] };
     return {
       id: p.id,
-      flow: "Kunjungan",
+      flow: "Check-in Outlet",
       status: "ONGOING",
       synced: true,
-      time: `0${8 + Math.floor(i / 2)}:${i % 2 ? "30" : "00"} AM`.replace(/^0(\d\d)/, "$1"),
+      time: visitTime(i),
       orderIndex: p.seq,
       values: {
         namaOutlet: o.name,
         alamatOutlet: o.address,
         lokasiOutlet: o.gps ? `${o.gps.lat},${o.gps.lng}` : "",
-        kelasOutlet: [o.cls],
-        kodeOutlet: o.code,
+        segmenOutlet: [o.segment],
         teleponOutlet: o.phone,
-        limitKredit: o.creditLimit,
-        outstanding: o.outstanding,
-        overdue: o.overdue,
-        sisaLimit: Math.max(0, o.creditLimit - o.outstanding),
-        pesananTerakhir: last ? `${last.no} · ${last.date}` : "-",
-        pesanan,
-        katalogPesanan: katalog,
+        ...orderValuesFor(o),
+        pesanan: undefined,
+        katalogPesanan: undefined,
       },
     };
   });
+  const akhiri: Task = {
+    id: "CP-END", flow: "Akhiri Call Plan", status: "ONGOING", synced: true, time: "05:00 PM", orderIndex: 9999,
+    values: { ruteHariIni: SALESMAN.route, judulAkhir: "Tutup hari: rencana vs realisasi" },
+  };
+  return [mulai, ...visits, akhiri];
+}
+
+/** Akhiri Call Plan summary, computed from today's tasks (plan vs actual, orders, collections, pending sync). */
+function daySummary(tasks: Task[]): Values {
+  const visits = tasks.filter((t) => t.flow === "Check-in Outlet");
+  const planned = visits.filter((t) => TODAY_PLAN.some((p) => p.id === t.id));
+  const isSkipped = (t: Task) => ((t.values.statusKunjungan as string[] | undefined) ?? []).includes("Dilewati");
+  const visited = visits.filter((t) => t.status === "DONE" && !isSkipped(t));
+  const skipped = visits.filter((t) => t.status === "DONE" && isSkipped(t));
+  const open = planned.filter((t) => t.status !== "DONE");
+  const orders = tasks.filter((t) => t.flow === "Penjualan" && t.status === "DONE");
+  const orderTotal = orders.reduce((a, t) => a + billTotals(t.values.pesanan as BillValue | undefined).total, 0);
+  const pays = tasks.filter((t) => t.flow === "Penagihan" && t.status === "DONE");
+  const payTotal = pays.reduce((a, t) => a + (Number(t.values.nilaiDibayar) || 0), 0);
+  return {
+    ringkasRencana: `${planned.length} kunjungan`,
+    ringkasRealisasi: `${visited.length} dikunjungi · ${skipped.length} dilewati · ${open.length} belum`,
+    ringkasOrder: `${orders.length} pesanan · Rp ${num(orderTotal)}`,
+    ringkasTagih: `${pays.length} penagihan · Rp ${num(payTotal)}`,
+    ringkasSync: `${tasks.filter((t) => t.status === "DONE" && !t.synced).length} task`,
+    ringkasBelum: open.length ? open.map((t) => t.values.namaOutlet).join(", ") : "Tidak ada",
+    waktuAkhir: `${clock()} · ${DATE_LABEL}`,
+  };
 }
 
 interface Toast { id: number; text: string }
@@ -73,6 +125,8 @@ interface Store {
   pop: () => void;
   tasks: Task[];
   createTask: (flow: string, values: Values) => string;
+  /** task values plus live derived values (Akhiri Call Plan summary while the task is open) */
+  valuesOf: (task: Task) => Values;
   setValues: (taskId: string, values: Values) => void;
   finishTask: (taskId: string) => void;
   offline: boolean;
@@ -141,12 +195,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     tasks,
     createTask: (flow, values) => {
       const id = `T${Date.now()}`;
-      setTasks((ts) => [...ts, { id, flow, values, status: "ONGOING", synced: !offlineRef.current, time: clock(), orderIndex: ts.length + 1 }]);
+      setTasks((ts) => [...ts, { id, flow, values: derivedOnCreate(flow, values), status: "ONGOING", synced: !offlineRef.current, time: clock(), orderIndex: ts.length + 1 }]);
       return id;
     },
+    valuesOf: (task) => (task.flow === "Akhiri Call Plan" && task.status !== "DONE" ? { ...task.values, ...daySummary(tasks) } : task.values),
     setValues: (taskId, values) => setTasks((ts) => ts.map((t) => (t.id === taskId ? { ...t, values: { ...t.values, ...values } } : t))),
     finishTask: (taskId) => {
-      setTasks((ts) => ts.map((t) => (t.id === taskId ? { ...t, status: "DONE", synced: false } : t)));
+      setTasks((ts) => ts.map((t) => (t.id === taskId ? { ...t, values: t.flow === "Akhiri Call Plan" ? { ...t.values, ...daySummary(ts) } : t.values, status: "DONE", synced: false } : t)));
       setTimeout(() => syncNow(), 400);
     },
     offline, syncProgress, syncNow, syncLabel,
