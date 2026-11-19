@@ -23,6 +23,19 @@ export interface Outlet {
   demoDistance: number;
   lastOrder?: { no: string; date: string; total: number; status: string; items: { productId: string; uom: string; qty: number }[] };
   prospect?: boolean;
+  /** D-51: days the outlet accepts visits (optional master field; omitted = all days Senin–Sabtu). */
+  visitDays?: VisitDay[];
+}
+
+/** D-51: outlet visit days (Hari Kunjungan), Senin–Sabtu. */
+export const VISIT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"] as const;
+export type VisitDay = (typeof VISIT_DAYS)[number];
+/** "Senin – Sabtu" for a contiguous run, otherwise "Senin, Rabu, Jumat". */
+export function visitDaysLabel(o: Outlet): string {
+  const days = VISIT_DAYS.filter((d) => (o.visitDays ?? VISIT_DAYS).includes(d));
+  const idx = days.map((d) => VISIT_DAYS.indexOf(d));
+  const contiguous = idx.every((v, i) => i === 0 || v === idx[i - 1] + 1);
+  return days.length > 2 && contiguous ? `${days[0]} – ${days[days.length - 1]}` : days.join(", ");
 }
 
 export interface UomPrice { uom: string; price: number; conv: number }
@@ -67,10 +80,10 @@ export const OUTLETS: Outlet[] = [
     lastOrder: { no: "SO-SBY-202611-0009", date: "11 Nov 2026", total: 7_548_000, status: "Dikirim", items: [{ productId: "P01", uom: "karton", qty: 10 }, { productId: "P02", uom: "karton", qty: 4 }, { productId: "P09", uom: "pack", qty: 20 }] } },
   { id: "O2", code: "SBY-0157", name: "UD Makmur Jaya", owner: "Siti Rahayu", phone: "081231234502", address: "Jl. Tambak Wedi Baru 8, Surabaya", segment: "Toko Kemasan", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 20_000_000, outstanding: 18_900_000, overdue: 4_250_000, overdueDays: 12, top: 14, gps: { lat: -7.2311, lng: 112.7769 }, demoDistance: 41,
     lastOrder: { no: "SO-SBY-202610-0131", date: "28 Okt 2026", total: 2_310_000, status: "Selesai", items: [{ productId: "P03", uom: "pack", qty: 40 }, { productId: "P04", uom: "pack", qty: 30 }] } },
-  { id: "O3", code: "SBY-0163", name: "Kedai Kopi Pantai Ria", owner: "Agus Salim", phone: "081231234503", address: "Jl. Pantai Ria Kenjeran 21, Surabaya", segment: "Horeka", status: "Lama – belum beli", priceGroup: "Horeka / Industri", creditLimit: 5_000_000, outstanding: 0, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2402, lng: 112.7951 }, demoDistance: 168 },
+  { id: "O3", code: "SBY-0163", name: "Kedai Kopi Pantai Ria", owner: "Agus Salim", phone: "081231234503", address: "Jl. Pantai Ria Kenjeran 21, Surabaya", segment: "Horeka", status: "Lama – belum beli", visitDays: ["Senin", "Rabu", "Jumat"], priceGroup: "Horeka / Industri", creditLimit: 5_000_000, outstanding: 0, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2402, lng: 112.7951 }, demoDistance: 168 },
   { id: "O4", code: "SBY-0171", name: "Grosir Plastik Abadi", owner: "Lukas Tanoto", phone: "081231234504", address: "Jl. Sukolilo Lor 45, Surabaya", segment: "Grosir Plastik", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 75_000_000, outstanding: 42_000_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2551, lng: 112.7882 }, demoDistance: 12,
     lastOrder: { no: "SO-SBY-202611-0004", date: "4 Nov 2026", total: 14_850_000, status: "Selesai", items: [{ productId: "P06", uom: "karton", qty: 5 }, { productId: "P12", uom: "karton", qty: 8 }, { productId: "P11", uom: "bal", qty: 10 }] } },
-  { id: "O5", code: "SBY-0188", name: "Toko Kue Bu Ani", owner: "Ani Lestari", phone: "081231234505", address: "Jl. Bulak Banteng 17, Surabaya", segment: "Toko Kemasan", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 3_000_000, outstanding: 640_000, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2265, lng: 112.7612 }, demoDistance: 55,
+  { id: "O5", code: "SBY-0188", name: "Toko Kue Bu Ani", owner: "Ani Lestari", phone: "081231234505", visitDays: ["Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"], address: "Jl. Bulak Banteng 17, Surabaya", segment: "Toko Kemasan", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 3_000_000, outstanding: 640_000, overdue: 0, overdueDays: 0, top: 7, gps: { lat: -7.2265, lng: 112.7612 }, demoDistance: 55,
     lastOrder: { no: "SO-SBY-202610-0145", date: "30 Okt 2026", total: 640_000, status: "Selesai", items: [{ productId: "P08", uom: "pack", qty: 8 }, { productId: "P04", uom: "pack", qty: 9 }] } },
   { id: "O6", code: "SBY-0193", name: "RM Sederhana Kenjeran", owner: "Rudi Hartono", phone: "081231234506", address: "Jl. Kenjeran No. 330, Surabaya", segment: "Horeka", status: "Lama – sudah beli", priceGroup: "Horeka / Industri", creditLimit: 15_000_000, outstanding: 5_120_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2447, lng: 112.7705 }, demoDistance: 33,
     lastOrder: { no: "SO-SBY-202611-0002", date: "3 Nov 2026", total: 5_120_000, status: "Dikirim", items: [{ productId: "P04", uom: "karton", qty: 4 }, { productId: "P03", uom: "karton", qty: 2 }] } },
@@ -78,7 +91,7 @@ export const OUTLETS: Outlet[] = [
     lastOrder: { no: "SO-SBY-202610-0120", date: "21 Okt 2026", total: 2_400_000, status: "Selesai", items: [{ productId: "P07", uom: "pcs", qty: 48 }, { productId: "P01", uom: "pack", qty: 66 }] } },
   { id: "O8", code: "PRS-0012", name: "Calon: Toko Plastik Berkah", owner: "Yusuf Hamdani", phone: "081231234508", address: "Jl. Tanah Merah Utara 9, Surabaya", segment: "Toko Kemasan", status: "Baru", priceGroup: "Retail", creditLimit: 0, outstanding: 0, overdue: 0, overdueDays: 0, top: 0, demoDistance: 0, prospect: true },
   // Outside today's route: for Kunjungan Ekstra
-  { id: "O9", code: "SBY-0215", name: "Toko Plastik Maju Bersama", owner: "Andreas Gunawan", phone: "081231234509", address: "Jl. Mulyorejo Utara 50, Surabaya", segment: "Toko Kelontong", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 12_000_000, outstanding: 3_300_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2660, lng: 112.7850 }, demoDistance: 27,
+  { id: "O9", code: "SBY-0215", name: "Toko Plastik Maju Bersama", owner: "Andreas Gunawan", phone: "081231234509", visitDays: ["Senin", "Kamis", "Sabtu"], address: "Jl. Mulyorejo Utara 50, Surabaya", segment: "Toko Kelontong", status: "Lama – sudah beli", priceGroup: "Retail", creditLimit: 12_000_000, outstanding: 3_300_000, overdue: 0, overdueDays: 0, top: 14, gps: { lat: -7.2660, lng: 112.7850 }, demoDistance: 27,
     lastOrder: { no: "SO-SBY-202610-0099", date: "14 Okt 2026", total: 3_300_000, status: "Selesai", items: [{ productId: "P02", uom: "pack", qty: 60 }, { productId: "P09", uom: "pack", qty: 20 }] } },
   { id: "O10", code: "SBY-0222", name: "CV Sentosa Packaging", owner: "Melinda Halim", phone: "081231234510", address: "Jl. Kalijudan 77, Surabaya", segment: "Agen / Sub-distributor", status: "Lama – sudah beli", priceGroup: "Grosir", creditLimit: 60_000_000, outstanding: 12_700_000, overdue: 0, overdueDays: 0, top: 30, gps: { lat: -7.2580, lng: 112.7710 }, demoDistance: 46 },
 ];

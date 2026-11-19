@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { INVOICES, OUTLETS, SALESMAN, TODAY_PLAN, assortmentOf, outletById, priceFor, productById, type Outlet } from "@/data/mock";
+import { INVOICES, OUTLETS, SALESMAN, TODAY_PLAN, assortmentOf, outletById, priceFor, productById, visitDaysLabel, type Outlet } from "@/data/mock";
 import { billTotals, num, type BillItemMaster, type BillValue, type Values } from "@/flow/types";
 
 export interface Task {
@@ -76,6 +76,7 @@ function seedTasks(): Task[] {
         lokasiOutlet: o.gps ? `${o.gps.lat},${o.gps.lng}` : "",
         segmenOutlet: [o.segment],
         teleponOutlet: o.phone,
+        hariKunjungan: visitDaysLabel(o),
         ...orderValuesFor(o),
         pesanan: undefined,
         katalogPesanan: undefined,

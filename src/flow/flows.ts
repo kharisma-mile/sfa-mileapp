@@ -2,7 +2,7 @@
   UP flows expressed as Mile Field flow configuration (standard components only).
   The same JSON shape can be posted to POST /api/v3/flow (see research-flow/flow.json).
 */
-import { CHECKLIST, COMPETITOR_BRANDS, FEEDBACK_CATEGORIES, INVOICES, NO_ORDER_REASONS, OUTLETS, PRODUCTS, SEGMENTS, SKIP_REASONS } from "@/data/mock";
+import { CHECKLIST, COMPETITOR_BRANDS, FEEDBACK_CATEGORIES, INVOICES, NO_ORDER_REASONS, OUTLETS, PRODUCTS, SEGMENTS, SKIP_REASONS, VISIT_DAYS } from "@/data/mock";
 import type { BillItemMaster, Component, Flow, OnSelectRule } from "./types";
 
 const PRODUCT_ITEMS: BillItemMaster[] = PRODUCTS.flatMap((p) => p.uoms.map((u) => ({ name: `${p.name} (${u.uom})`, unit_price: u.price })));
@@ -52,6 +52,7 @@ export const FLOW_CHECKIN: Flow = {
       sel("segmenOutlet", "Segmen", SEGMENTS, { showAs: "label", routeAs: "Tag" }),
       inp("kodeOutlet", "Kode Outlet", "String"),
       inp("teleponOutlet", "Telepon", "PhoneNumber"),
+      inp("hariKunjungan", "Hari Kunjungan", "String"),
       inp("limitKredit", "Limit Kredit", "Numeric", { min: 0, max: 999999999 }),
       inp("outstanding", "Outstanding", "Numeric", { min: 0, max: 999999999 }),
       inp("overdue", "Overdue", "Numeric", { min: 0, max: 999999999 }),
@@ -64,6 +65,7 @@ export const FLOW_CHECKIN: Flow = {
       view("infoAlamat", "Alamat", "Address", "$alamatOutlet"),
       view("infoLokasi", "Lokasi Outlet", "Geolocation", "$lokasiOutlet"),
       view("infoTelepon", "Telepon", "PhoneNumber", "$teleponOutlet"),
+      view("infoHariKunjungan", "Hari Kunjungan", "String", "$hariKunjungan"),
       view("infoLimit", "Limit Kredit", "Numeric", "$limitKredit"),
       view("infoOutstanding", "Outstanding", "Numeric", "$outstanding"),
       view("infoOverdue", "Overdue", "Numeric", "$overdue"),
@@ -194,6 +196,7 @@ export const FLOW_NOO: Flow = {
       sel("jenisUsaha", "Jenis Usaha", ["Toko plastik / kemasan", "Grosir", "Horeka", "Industri", "Toko kelontong"], { showAs: "label" }),
       inp("namaPemilik", "Nama Pemilik", "String", { required: true }),
       inp("teleponPemilik", "Telepon Pemilik", "PhoneNumber", { required: true }),
+      sel("hariKunjunganNoo", "Hari Kunjungan", [...VISIT_DAYS], { max: VISIT_DAYS.length }),
     ] },
     { id: "page1", title: "Dokumen", components: [
       photo("fotoTokoNoo", "Foto Toko", 1, 2),
